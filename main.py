@@ -1,18 +1,25 @@
 from flask import Flask, jsonify
 import requests
-import os
 
 app = Flask(__name__)
 
+# رابط بسيط لجلب سعر الذهب الحالي (محاكاة للسوق)
+def get_gold_price():
+    # في الاستراتيجية القادمة سنربط هذا ببيانات لحظية دقيقة
+    return 2350.00 
+
 @app.route('/')
-def get_market_data():
-    # استخدام رابط بيانات السوق
-    url = "https://public.api.exness.com/v1/market-data/XAUUSD"
-    try:
-        # هنا سنقوم بجلب السعر (مثال توضيحي)
-        return jsonify({"symbol": "XAUUSD", "price": "2350.00", "status": "Live Data"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+def analyze_market():
+    current_price = get_gold_price()
+    # استراتيجية بسيطة: إذا كان السعر فوق 2300 فهو "صاعد"، دونه فهو "هابط"
+    trend = "صاعد (Bullish)" if current_price > 2300 else "هابط (Bearish)"
+    
+    return jsonify({
+        "Symbol": "XAUUSD",
+        "CurrentPrice": current_price,
+        "Trend": trend,
+        "SystemStatus": "Active & Analyzing"
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
