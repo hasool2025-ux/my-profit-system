@@ -1,25 +1,20 @@
-from flask import Flask, jsonify
 import requests
+import os
+from flask import Flask
 
 app = Flask(__name__)
 
-# رابط بسيط لجلب سعر الذهب الحالي (محاكاة للسوق)
-def get_gold_price():
-    # في الاستراتيجية القادمة سنربط هذا ببيانات لحظية دقيقة
-    return 2350.00 
+# جلب البيانات من إعدادات Railway
+TOKEN = os.getenv('TELEGRAM_TOKEN')
+CHAT_ID = os.getenv('CHAT_ID')
 
-@app.route('/')
-def analyze_market():
-    current_price = get_gold_price()
-    # استراتيجية بسيطة: إذا كان السعر فوق 2300 فهو "صاعد"، دونه فهو "هابط"
-    trend = "صاعد (Bullish)" if current_price > 2300 else "هابط (Bearish)"
-    
-    return jsonify({
-        "Symbol": "XAUUSD",
-        "CurrentPrice": current_price,
-        "Trend": trend,
-        "SystemStatus": "Active & Analyzing"
-    })
+@app.route('/notify')
+def send_alert():
+    price = 2350.00 # هذا الرقم سيتحدث لاحقاً ببيانات حقيقية
+    message = f"تنبيه الذهب: السعر الآن {price} دولار. السوق في حالة نشطة."
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}"
+    response = requests.get(url)
+    return "تم إرسال التنبيه لهاتفك!"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
