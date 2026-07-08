@@ -4,27 +4,21 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-# طباعة تأكيدية عند التشغيل
-print("Server is running...")
+TOKEN = os.getenv('TELEGRAM_TOKEN')
+CHAT_ID = os.getenv('CHAT_ID')
 
-@app.route('/notify', methods=['POST', 'GET'])
+@app.route('/notify', methods=['POST'])
 def notify():
-    # طباعة البيانات التي تصل للسيرفر في سجلات Railway
     data = request.json
-    print(f"Data received: {data}")
-    
+    print(f"Data received: {data}") # هذا سيظهر في الـ Logs
     if data and 'message' in data:
-        message_text = data['message'].get('text', '')
-        print(f"Message content: {message_text}")
-        
-        # رد تلقائي للبوت ليؤكد أنه استلم الرسالة
-        token = os.getenv('TELEGRAM_TOKEN')
-        chat_id = os.getenv('CHAT_ID')
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        payload = {'chat_id': chat_id, 'text': f"تم الاستلام: {message_text}"}
-        requests.post(url, data=payload)
-        
+        msg = data['message'].get('text', '')
+        requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", 
+                      data={'chat_id': CHAT_ID, 'text': f"تم الاستلام: {msg}"})
     return "OK", 200
 
+# ربط تلقائي عند التشغيل
 if __name__ == '__main__':
+    webhook_url = f"https://api.telegram.org/bot{TOKEN}/setWebhook?url=https://my-profit-system-production.up.railway.app/notify"
+    requests.get(webhook_url)
     app.run(host='0.0.0.0', port=5000)
