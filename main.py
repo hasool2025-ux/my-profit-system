@@ -1,30 +1,22 @@
 import os
-import re
-from flask import Flask, request
 import requests
+from flask import Flask, request
 
 app = Flask(__name__)
 
 TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
-def send_to_telegram(text):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {'chat_id': CHAT_ID, 'text': text, 'parse_mode': 'Markdown'}
-    requests.post(url, data=payload)
-
+# هذا المسار هو الذي سيستقبل الرسائل من تليجرام
 @app.route('/notify', methods=['POST'])
 def notify():
-    # هذا المسار يستقبل الرسالة المحولة (Forwarded)
     data = request.json
-    message_text = data.get('message', {}).get('text', '')
-
-    # منطق استخراج البيانات (سعر الدخول والهدف)
-    # يبحث عن أي أرقام تتبع كلمات مثل buy أو entry
-    if "buy" in message_text.lower():
-        formatted_msg = f"🟢 *توصية شراء جديدة*\n\n{message_text}"
-        send_to_telegram(formatted_msg)
-    
+    if data and 'message' in data:
+        message_text = data['message'].get('text', '')
+        # هنا سنرسل الرسالة التي استلمناها إلى تليجرام مرة أخرى
+        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+        payload = {'chat_id': CHAT_ID, 'text': f"وصلتني رسالة: {message_text}"}
+        requests.post(url, data=payload)
     return "OK", 200
 
 if __name__ == '__main__':
