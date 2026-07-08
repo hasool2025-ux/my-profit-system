@@ -17,4 +17,5 @@ def send_alert():
     return "تم إرسال التنبيه لهاتفك!"
 
 if __name__ == '__main__':
+    # هذا السطر ضروري جداً لكي يراه Railway
     app.run(host='0.0.0.0', port=5000)
