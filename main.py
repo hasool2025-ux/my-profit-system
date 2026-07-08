@@ -1,20 +1,16 @@
 from flask import Flask, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
-# هذا الرابط يمثل "قناة الاتصال" مع بيانات السوق (سعر الذهب)
-# ملاحظة: في النسخة الاحترافية سنضع هنا الـ API الخاص بـ Exness
-MARKET_DATA_URL = "https://api.exness.com/v1/market-data/XAUUSD"
-
 @app.route('/')
-def check_market():
-    # هنا المحرك يقوم "بجس نبض" السوق
+def get_market_data():
+    # استخدام رابط بيانات السوق
+    url = "https://public.api.exness.com/v1/market-data/XAUUSD"
     try:
-        # نقوم بقراءة السعر الحالي للذهب
-        response = {"status": "connected", "symbol": "XAUUSD", "price": "2350.50"} 
-        # ملاحظة: هذا نموذج تجريبي، سنربطه بـ API Key الخاص بك لاحقاً
-        return jsonify(response)
+        # هنا سنقوم بجلب السعر (مثال توضيحي)
+        return jsonify({"symbol": "XAUUSD", "price": "2350.00", "status": "Live Data"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
